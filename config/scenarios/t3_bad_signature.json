@@ -1,0 +1,15 @@
+{
+  "gst_ms": 0,
+  "faulty_nodes": [
+    {
+      "node": "N3",
+      "type": "bad_signature",
+      "mode": "cycle"
+    }
+  ],
+  "tests": [
+    "bad_key",
+    "wrong_domain",
+    "tamper"
+  ]
+}
