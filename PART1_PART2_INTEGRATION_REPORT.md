@@ -15,8 +15,8 @@ Ngày thực hiện: **05/11/2026**, múi giờ Asia/Bangkok.
 | Commit remote mới nhất tích hợp | `bfdfd76`, merge PR #1 từ `thngoc17/feat/chain-rules` |
 | Branch tích hợp | `integration/part1-part2` |
 | Merge commit local | `e1d2f20`, `merge: combine part1 environment with part2 chain rules` |
-| Commit sửa điểm ghép | Thông điệp `fix(integration): connect simulation to chain rules`; xem SHA bằng `git log -1 --oneline` |
-| Push / PR | **Chưa push, chưa mở PR**, theo yêu cầu chỉ thực hiện khi người dùng cho phép |
+| Commit sửa điểm ghép | `c045a16`, `fix(integration): connect simulation to chain rules` |
+| Push / PR | Đã được người dùng cho phép; push lên `vtpy23/Blockchain_lab01`, branch `integration/part1-part2`; [PR #2](https://github.com/CatnCactus72/Blockchain_lab01/pull/2) về `CatnCactus72:main`, chưa merge |
 
 Đã tạo backup branch `backup/part1-before-part2-20261105` tại commit Phần 1. Ngoài repository có bản ZIP **149 file**, Git bundle đã xác minh và manifest:
 
@@ -209,12 +209,12 @@ python -m tests.check_part1_part2
 | Ký sai domain TX bằng khóa user kiểm soát | Người 2/3 cùng workload | P1 – adapter validator không sở hữu khóa user |
 | Runtime Python 3.10 | Nhóm/CI | P2 – mới kiểm cú pháp, runtime đã chạy 3.11.8 |
 
-Đã rà diff, giữ nguyên source còn dở của Người 3 và toàn bộ test Người 1/2; thay đổi Phần 2 chỉ giới hạn ở interface/validation lỗi dữ liệu và log viewer đã liệt kê. Không force-push, không tự merge main, không tự push.
+Đã rà diff, giữ nguyên source còn dở của Người 3 và toàn bộ test Người 1/2; thay đổi Phần 2 chỉ giới hạn ở interface/validation lỗi dữ liệu và log viewer đã liệt kê. Không force-push, không merge main.
 
-Sau khi người dùng cho phép:
+Sau khi người dùng cho phép push/mở PR, đã chạy lại 73 tests và chương trình kiểm tra tích hợp: đều đạt. Direct push vào origin bị GitHub từ chối 403 vì tài khoản `vtpy23` chưa có quyền ghi. Đã tạo fork `vtpy23/Blockchain_lab01`, giữ nguyên origin, thêm remote `fork`, push branch và mở [PR #2](https://github.com/CatnCactus72/Blockchain_lab01/pull/2). Lệnh push cho các cập nhật tiếp theo:
 
 ```powershell
-git push -u origin integration/part1-part2
+git push -u fork integration/part1-part2
 ```
 
-Trên GitHub mở PR **base: main**, **compare: integration/part1-part2**. Tiêu đề gợi ý: `Integrate deterministic simulation with chain rules`. Nội dung nêu snapshot transport, workload ký thật, SyncManager và NodeEnv; validation 73 tests + determinism; ghi rõ consensus/e2e còn PENDING. Không đưa backup branch, log, bytecode hoặc prompt vào PR.
+PR có **base: CatnCactus72:main**, **head: vtpy23:integration/part1-part2**, tiêu đề `Integrate deterministic simulation with chain rules`. Nội dung ghi validation 73 tests + determinism và consensus/e2e còn PENDING. Không đưa backup branch, log, bytecode hoặc prompt vào PR.
