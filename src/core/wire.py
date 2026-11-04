@@ -370,7 +370,9 @@ class Message:
         origin, cur = dec_str(data, cur)
         payload_bytes, cur = dec_bytes(data, cur)
         signature, cur = dec_bytes(data, cur)
-        payload, _ = decode_payload(kind, payload_bytes, 0)
+        payload, payload_end = decode_payload(kind, payload_bytes, 0)
+        if payload_end != len(payload_bytes):
+            raise ValueError('Payload của Message còn dư byte không hợp lệ')
         return cls(
             kind=kind,
             origin=origin,

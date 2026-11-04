@@ -1,13 +1,13 @@
 """Tiêm lỗi chữ ký. Mode cần ký lại được giao cho API node thuộc Người 2/3."""
 from copy import copy
-from dataclasses import is_dataclass, replace
+from dataclasses import fields, is_dataclass, replace
 from .base import Behavior, refresh_wire_message
 
 
 def _replace_signature(message):
     """Đổi một byte chữ ký; không sửa message gốc. Hỗ trợ cả payload có signature."""
     sig = message.get('signature') if isinstance(message,dict) else getattr(message,'signature',None)
-    if sig is None:
+    if not sig:
         payload = message.get('payload') if isinstance(message,dict) else getattr(message,'payload',None)
         if payload is None:
             raise ValueError('Wire message không có payload hoặc signature')
@@ -28,7 +28,9 @@ def _replace_signature(message):
     if isinstance(message,dict):
         return {**message,'signature':bad_sig}
     if is_dataclass(message):
-        return replace(message,signature=bad_sig)
+        # Proposal dùng property signature nhưng trường dataclass là proposal_sig.
+        name = 'signature' if 'signature' in {field.name for field in fields(message)} else 'proposal_sig'
+        return replace(message,**{name:bad_sig})
     new = copy(message)
     setattr(new,'signature',bad_sig)
     return new

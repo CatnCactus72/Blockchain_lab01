@@ -1,4 +1,5 @@
 """Mạng P2P mô phỏng. Mạng không import consensus hay đọc trạng thái node."""
+from copy import deepcopy
 from .gossip import GOSSIP_KINDS, GossipTracker, message_kind, message_origin, message_id, normalize_verdict
 from .link import Link
 from .rate_limit import OutboundRateLimiter, InboundRateLimiter
@@ -39,6 +40,8 @@ class Network:
         return self.sim.logger.log(node, ev, **kwargs)
 
     def send(self, source: str, dest: str, message, h: int = -1, r: int | None = None) -> None:
+        # Cô lập dữ liệu đầu vào để hook hoặc node khác không sửa gói đang chờ gửi.
+        message = deepcopy(message)
         # Áp dụng hook lỗi CẢ KHI network tự forward gossip, không chỉ lần gửi đầu.
         node = self.sim.nodes.get(source)
         behavior = getattr(node,'behavior',None)
@@ -55,7 +58,15 @@ class Network:
         if when > self.sim.clock.now():
             self.log(source,'DELAY',h=h,r=r,msg=message_id(message)[:6],kind=message_kind(message),
                      origin=message_origin(message),via=source,reason='RATE_LIMIT',details=f'until:{when}')
-        self.sim.schedule(when, 'net-send', self._transmit,source,dest,message,h,r)
+        self.sim.schedule(when, 'net-send', self._transmit,source,dest,deepcopy(message),h,r)
+
+    def inject(self, node_id: str, message) -> None:
+        """Đưa giao dịch client vào node nhận rồi gossip khi node chấp nhận."""
+        if message_kind(message) != 'TX':
+            raise ValueError('Client chỉ được đưa wire message TX vào node')
+        if node_id not in self.handlers:
+            raise ValueError('Node nhận client chưa đăng ký')
+        self._dispatch(node_id,node_id,deepcopy(message),-1,None,client=True)
 
     def gossip(self, source: str, message, exclude: str | None = None,
                h: int = -1, r: int | None = None) -> None:
@@ -94,16 +105,22 @@ class Network:
         if status == 'PEER_BLOCKED':
             self.log(dest,'DROP',h=h,r=r,msg=msgid,kind=kind,origin=origin,via=source,reason='PEER_BLOCKED')
             return
+        self._dispatch(source,dest,message,h,r)
+
+    def _dispatch(self, source, dest, message, h, r, client=False):
+        msgid, kind, origin = message_id(message)[:6], message_kind(message),message_origin(message)
         first = True
         if kind in GOSSIP_KINDS:
             first = self.tracker.mark_seen(dest,message)
-        self.log(dest,'RECV',h=h,r=r,msg=msgid,kind=kind,origin=origin,via=source,first=first)
+        self.log(dest,'RECV',h=h,r=r,msg=msgid,kind=kind,origin=origin,via=source,first=first,
+                 details='client' if client else None)
         if not first:
             self.log(dest,'DUP',h=h,r=r,msg=msgid,kind=kind,origin=origin,via=source,reason='DUPLICATE_MSG')
             return
         if dest not in self.handlers:
             raise RuntimeError(f'Node chưa đăng ký callback: {dest}')
-        raw_verdict = self.handlers[dest](source,message)
+        # Callback nhận bản sao; chỉ nội dung gốc đã được ACCEPT mới chuyển tiếp.
+        raw_verdict = self.handlers[dest](source,deepcopy(message))
         result = normalize_verdict(raw_verdict)
         if result == 'REJECT':
             reason = getattr(raw_verdict,'reason',None)

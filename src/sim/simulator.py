@@ -103,6 +103,10 @@ class Simulator:
             raise ValueError('Sự kiện không thể xảy ra trong quá khứ')
         return self.queue.push(at_ms,name,callback,*args,**kwargs)
 
+    def inject_message(self, node_id: str, message) -> None:
+        """Nhận TX từ workload qua callback của node, không sửa trực tiếp pool/state."""
+        self.network.inject(node_id,message)
+
     def _reached_height(self, target_height: int, correct_nodes: list[str]) -> bool:
         if not correct_nodes:
             return False

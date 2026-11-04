@@ -1,5 +1,7 @@
 # Phần 1 – Môi trường mô phỏng, mạng, logging, fault injection
 
+> Đã ghép Phần 2 ngày 05/11/2026 trên `integration/part1-part2`. Xem [báo cáo tích hợp hiện hành](PART1_PART2_INTEGRATION_REPORT.md); số liệu và trạng thái bên dưới là bàn giao Phần 1 ngày 04/11. Chạy `python -m tests.check_part1_part2` để kiểm chữ ký, wire và đồng bộ certificate fixture trên 10 node; consensus vẫn PENDING.
+
 **Mục tiêu:** Đây là phần code được giao cho Người 1, tách biệt với luật blockchain (Người 2) và consensus/node (Người 3). Mọi comment trong source code đều viết tiếng Việt. **Chưa phải bản Lab 01 hoàn chỉnh** nếu chưa ghép 2 phần còn lại.
 
 ## Đã hiện thực

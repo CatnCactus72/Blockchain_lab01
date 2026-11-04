@@ -205,7 +205,12 @@ class SyncManager:
           3) Áp dụng các giao dịch vào self.state và xóa giao dịch khỏi self.tx_pool.
         - Trả về (ok, reason, danh_sách_khối_mới_đã_áp_dụng).
         """
-        pairs = self._extract_block_cert_pairs(payload)
+        if not self.validator_pubkeys or self.account_pubkeys is None:
+            return False, BAD_SIGNATURE, []
+        try:
+            pairs = self._extract_block_cert_pairs(payload)
+        except (KeyError, TypeError, ValueError, AttributeError):
+            return False, BAD_SIGNATURE, []
         # Sắp xếp các khối theo chiều cao tăng dần để áp dụng tuần tự
         pairs.sort(key=lambda item: item[0].height)
 
@@ -341,6 +346,8 @@ class SyncManager:
         Kiểm tra chữ ký và tính hợp lệ của từng phiếu bầu qua validate_vote().
         Trả về (True, None, valid_votes) hoặc (False, reason, valid_votes) nếu gặp phiếu sai.
         """
+        if not self.validator_pubkeys:
+            return False, BAD_SIGNATURE, []
         if isinstance(payload, Mapping):
             raw_votes = payload.get("votes", [])
         elif isinstance(payload, Sequence):
@@ -350,7 +357,10 @@ class SyncManager:
 
         valid_votes: list[Vote] = []
         for item in raw_votes:
-            vote = item if isinstance(item, Vote) else Vote.from_dict(item)
+            try:
+                vote = item if isinstance(item, Vote) else Vote.from_dict(item)
+            except (KeyError, TypeError, ValueError, AttributeError):
+                return False, BAD_SIGNATURE, valid_votes
             ok, reason = validate_vote(
                 vote=vote,
                 validator_pubkeys=self.validator_pubkeys,
@@ -404,4 +414,11 @@ class SyncManager:
                         else CommitCertificate.from_dict(item["certificate"])
                     )
                     pairs.append((blk, cert))
+        else:
+            raise ValueError('Payload BLOCKS phải là danh sách hoặc object')
+        if isinstance(payload, Mapping) and 'blocks' in payload and 'certificates' in payload:
+            if len(payload['blocks']) != len(payload['certificates']):
+                raise ValueError('Số block và certificate không khớp')
+        if any(not isinstance(block, Block) or not isinstance(cert, CommitCertificate) for block, cert in pairs):
+            raise ValueError('BLOCKS cần block và certificate đầy đủ')
         return pairs

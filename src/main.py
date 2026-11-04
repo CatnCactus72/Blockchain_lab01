@@ -93,12 +93,14 @@ def _get_smoke_factory():
 
 
 def _get_real_factory():
+    from .core.user import schedule_workload
     try:
         from .node.node import build_node
-        from .core.user import schedule_workload
     except (ImportError,AttributeError) as err:
-        raise RuntimeError('Chưa ghép phần Người 2/3. Cần src.node.node.build_node và '
-                           'src.core.user.schedule_workload; dùng --smoke-env để tự kiểm môi trường.') from err
+        raise RuntimeError('Chưa ghép Người 3: cần src.node.node.build_node (Node/Consensus). '
+                           'Workload ký thật src.core.user.schedule_workload đã có; '
+                           'dùng --smoke-env để kiểm môi trường hoặc '
+                           'python -m tests.check_part1_part2 để kiểm tích hợp không có consensus.') from err
     return build_node, schedule_workload
 
 

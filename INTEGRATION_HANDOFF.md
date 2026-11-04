@@ -1,5 +1,16 @@
 # BÀN GIAO – Người 1 (môi trường mô phỏng)
 
+> Cập nhật 05/11/2026: Phần 2 đã được merge từ `origin/main`. Giao diện NodeEnv/Verdict và workload ký thật đã có; Node/Consensus của Người 3 còn thiếu. Báo cáo hiện hành: [PART1_PART2_INTEGRATION_REPORT.md](PART1_PART2_INTEGRATION_REPORT.md). Các nhận định “chưa có crypto/state” bên dưới là lịch sử bàn giao Phần 1 ngày 04/11.
+
+Kiểm tra điểm ghép bằng cấu trúc và chữ ký thật:
+
+```bash
+python -m unittest discover -s tests/unit -p 'test_*.py' -v
+python -m tests.check_part1_part2
+```
+
+Lệnh thứ hai dùng certificate fixture có chữ ký thật để kiểm chứng transport và sync; không có consensus. Người 3 import `NodeEnv`, `NodeCallbacks`, `Verdict` từ `src.node.interfaces`, cung cấp `src.node.node.build_node`, và dùng `src.core.user.schedule_workload` đã ghép. `Network.inject` gọi `node.on_message(node_id, TX)` cho client rồi gossip khi ACCEPT. Các callback lỗi có thể gắn từ `src.faults.signed.SignedFaultAdapter`; ký sai domain cho TX vẫn cần khóa user/callback riêng, invalid block cần Block Builder.
+
 ## 1. Những file đã tạo/thay đổi
 
 - `src/sim/clock.py`, `event_queue.py`, `rng.py`, `simulator.py`
