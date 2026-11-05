@@ -1,0 +1,10 @@
+{
+  "gst_ms": 0,
+  "faulty_nodes": [
+    {
+      "node": "N1",
+      "type": "silent",
+      "from_ms": 0
+    }
+  ]
+}

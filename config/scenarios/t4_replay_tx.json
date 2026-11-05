@@ -1,0 +1,11 @@
+{
+  "gst_ms": 0,
+  "workload_mode": "replay_alice",
+  "faulty_nodes": [
+    {
+      "node": "N5",
+      "type": "invalid_block",
+      "mode": "replayed_tx"
+    }
+  ]
+}

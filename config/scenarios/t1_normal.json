@@ -1,0 +1,8 @@
+{
+  "gst_ms": 0,
+  "pre_gst": {
+    "drop": 0.0,
+    "dup": 0.0,
+    "extra_delay_max_ms": 0
+  }
+}

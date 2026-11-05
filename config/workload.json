@@ -1,0 +1,23 @@
+{
+  "accounts": [
+    "alice",
+    "bob",
+    "carol",
+    "dave",
+    "erin"
+  ],
+  "messages": [
+    "Xin chào cả nhà 👋",
+    "Hôm nay mọi người khỏe không?",
+    "Blockchain thú vị thật!",
+    "Đồng thuận xong rồi ✅",
+    "Đã nhận được tin nhắn."
+  ],
+  "mode": "normal",
+  "every_ms": 500,
+  "burst": {
+    "at_ms": 5000,
+    "count": 100,
+    "within_ms": 1000
+  }
+}

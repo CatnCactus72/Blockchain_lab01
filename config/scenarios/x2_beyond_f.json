@@ -1,0 +1,21 @@
+{
+  "gst_ms": 0,
+  "faulty_nodes": [
+    {
+      "node": "N6",
+      "type": "silent"
+    },
+    {
+      "node": "N7",
+      "type": "silent"
+    },
+    {
+      "node": "N8",
+      "type": "silent"
+    },
+    {
+      "node": "N9",
+      "type": "silent"
+    }
+  ]
+}

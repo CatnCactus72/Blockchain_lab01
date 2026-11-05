@@ -1,0 +1,7 @@
+{
+  "gst_ms": 0,
+  "workload_mode": "burst",
+  "stop": {
+    "max_virtual_time_ms": 180000
+  }
+}

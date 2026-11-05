@@ -1,0 +1,6 @@
+{
+  "gst_ms": 30000,
+  "stop": {
+    "max_virtual_time_ms": 180000
+  }
+}

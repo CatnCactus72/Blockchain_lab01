@@ -1,0 +1,20 @@
+{
+  "gst_ms": 0,
+  "faulty_nodes": [
+    {
+      "node": "N2",
+      "type": "equivocate",
+      "target": "both"
+    },
+    {
+      "node": "N5",
+      "type": "equivocate",
+      "target": "both"
+    },
+    {
+      "node": "N8",
+      "type": "equivocate",
+      "target": "both"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "chain_id": "lab01-chain",
+  "n": 10,
+  "f": 3,
+  "seed": 42,
+  "max_text_chars": 200,
+  "max_tx_bytes": 1024,
+  "max_block_bytes": 4096,
+  "block_interval_ms": 1000,
+  "delta_ms": 500,
+  "timeouts": {
+    "base_ms": 5000,
+    "step_ms": 2000
+  },
+  "status_interval_ms": 2000,
+  "future_height_window": 5,
+  "rate_limit": {
+    "send_per_sec": 300,
+    "recv_window_ms": 1000,
+    "recv_max": 200,
+    "block_ms": 3000
+  },
+  "pre_gst": {
+    "drop": 0.3,
+    "dup": 0.15,
+    "extra_delay_max_ms": 4000
+  },
+  "post_gst": {
+    "dup": 0.0,
+    "extra_delay_max_ms": 0
+  },
+  "stop": {
+    "target_height": 10,
+    "max_virtual_time_ms": 120000
+  },
+  "topology_file": "config/topology.json",
+  "workload_file": "config/workload.json",
+  "gst_ms": 0,
+  "faulty_nodes": []
+}

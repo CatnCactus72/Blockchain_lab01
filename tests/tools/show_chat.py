@@ -17,14 +17,13 @@ import re
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote
 
 from src.core.block import Block
 from src.core.header import DEFAULT_CHAIN_ID, Header
 from src.core.transaction import Transaction
-from src.core.vote import CommitCertificate, PRECOMMIT, Vote
 from src.crypto.hashing import state_hash as compute_state_hash, tx_root as compute_tx_root
 from src.execution.state import State
-from src.node.ledger import Ledger
 from src.node.query import ChatQuery
 
 
@@ -68,7 +67,7 @@ def parse_log_line(line: str) -> dict[str, str] | None:
         v = rest[val_start:val_end].strip()
         if len(v) >= 2 and ((v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'"))):
             v = v[1:-1]
-        result[k] = v
+        result[k] = unquote(v)
     return result
 
 
@@ -120,13 +119,35 @@ def _extract_tx_from_event(fields: dict[str, str]) -> Transaction | None:
     return None
 
 
+class LogLedgerView:
+    """Bản đọc từ log, không tạo certificate và không dùng làm ledger tin cậy cho node."""
+    def __init__(self):
+        self._blocks = {0: Block.genesis()}
+
+    @property
+    def latest_height(self):
+        return max(self._blocks)
+
+    def latest(self):
+        return self._blocks[self.latest_height]
+
+    def get(self, height):
+        return self._blocks.get(height)
+
+    def all_blocks(self, include_genesis=True):
+        return [block for height, block in sorted(self._blocks.items()) if include_genesis or height > 0]
+
+    def record(self, block):
+        self._blocks[block.height] = block
+
+
 def reconstruct_node_from_log(
     log_path: str | Path,
     node_id: str | int = "N0",
-) -> tuple[Ledger, State, ChatQuery]:
+) -> tuple[LogLedgerView, State, ChatQuery]:
     """
-    Đọc file log mô phỏng và dựng lại Ledger (chỉ gồm các khối đã FINALIZE)
-    cùng State tương ứng của một node cụ thể, trả về (Ledger, State, ChatQuery).
+    Đọc sự kiện FINALIZE và TX_APPLIED của node; không coi log là certificate.
+    Trả về (LogLedgerView, State, ChatQuery) chỉ để quan sát dữ liệu đã ghi.
     """
     target_node = normalize_node_id(node_id)
     path = Path(log_path)
@@ -137,9 +158,6 @@ def reconstruct_node_from_log(
     finalized_by_height: dict[int, dict[str, Any]] = {}
     # Lưu các giao dịch TX_APPLIED của target_node theo height: h -> list[Transaction]
     node_txs_by_height: dict[int, list[Transaction]] = {}
-    # Dự phòng: lưu TX_APPLIED trên toàn mạng theo height nếu node chỉ ghi FINALIZE
-    global_txs_by_height: dict[int, list[Transaction]] = {}
-    seen_global_tx_ids: dict[int, set[str]] = {}
 
     with path.open("r", encoding="utf-8") as f:
         for line in f:
@@ -163,17 +181,13 @@ def reconstruct_node_from_log(
                 if tx is not None:
                     if node == target_node:
                         node_txs_by_height.setdefault(height, []).append(tx)
-                    tid = str(tx.tx_id())
-                    if tid not in seen_global_tx_ids.setdefault(height, set()):
-                        seen_global_tx_ids[height].add(tid)
-                        global_txs_by_height.setdefault(height, []).append(tx)
 
-    # Khởi tạo Ledger (không truyền validator_pubkeys để tái tạo từ log) và State
-    ledger = Ledger(chain_id=DEFAULT_CHAIN_ID, validator_pubkeys=None, quorum=1)
+    # Bản đọc log tách khỏi Ledger thật để không cần bịa phiếu hay hạ quorum.
+    ledger = LogLedgerView()
     state = State()
 
     for h in sorted(finalized_by_height.keys()):
-        txs = node_txs_by_height.get(h, global_txs_by_height.get(h, []))
+        txs = node_txs_by_height.get(h, [])
         for tx in txs:
             state.set(tx.key, tx.value, account=tx.account, nonce=tx.nonce)
 
@@ -190,20 +204,8 @@ def reconstruct_node_from_log(
         )
         block = Block(header=header, transactions=list(txs))
         blk_hash = str(block.block_hash())
-        dummy_vote = Vote(
-            height=h,
-            round=int(fin_info.get("r", 0)) if fin_info.get("r", "0").isdigit() else 0,
-            phase=PRECOMMIT,
-            block_hash=blk_hash,
-            validator_id=target_node,
-        )
-        cert = CommitCertificate(
-            height=h,
-            block_hash=blk_hash,
-            votes=[dummy_vote],
-            round=dummy_vote.round,
-        )
-        ledger.append(block, cert, validator_pubkeys=None, quorum=1)
+        block.logged_hash = fin_info.get('hash', blk_hash)
+        ledger.record(block)
 
     query = ChatQuery(ledger=ledger, state=state)
     return ledger, state, query
@@ -233,6 +235,8 @@ def format_chat_output(
     lines: list[str] = [
         f"=== KÊNH CHAT ĐÃ FINALIZE CỦA NODE {norm_node} (latest_height={query.ledger.latest_height}) ==="
     ]
+    if isinstance(query.ledger, LogLedgerView):
+        lines.append('(Dữ liệu đọc từ log; chưa xác minh certificate)')
 
     if not blocks:
         lines.append("(Không có block đã finalize nào thỏa mãn yêu cầu)")
@@ -241,9 +245,8 @@ def format_chat_output(
     for blk in blocks:
         if blk is None:
             continue
-        lines.append(
-            f"[Block h={blk.height} hash={str(blk.block_hash())[:8]} txs={len(blk.transactions)}]"
-        )
+        display_hash = getattr(blk, 'logged_hash', str(blk.block_hash()))
+        lines.append(f"[Block h={blk.height} hash={display_hash[:8]} txs={len(blk.transactions)}]")
         if not blk.transactions:
             lines.append("  (Block rỗng - không có tin nhắn)")
         else:

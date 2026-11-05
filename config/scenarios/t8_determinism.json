@@ -1,0 +1,8 @@
+{
+  "gst_ms": 0,
+  "seed": 42,
+  "determinism_cases": [
+    "t1_normal",
+    "t7_byzantine_equivocate"
+  ]
+}

@@ -144,3 +144,59 @@ def create_users(
 build_account_book = create_account_book
 derive_account_book = create_account_book
 make_account_book = create_account_book
+
+
+def schedule_workload(sim, config: dict, root_path) -> None:
+    """Lên lịch TX ký thật; client đi qua inject_message, không can thiệp state node."""
+    import json
+    from pathlib import Path
+    from src.core.wire import make_tx_message
+
+    workload = json.loads((Path(root_path) / config['workload_file']).read_text(encoding='utf-8'))
+    accounts = workload['accounts']
+    texts = workload['messages']
+    every_ms = workload['every_ms']
+    if not accounts or len(set(accounts)) != len(accounts) or not texts:
+        raise ValueError('Workload cần tài khoản không trùng và câu mẫu không rỗng')
+    if type(every_ms) is not int or every_ms <= 0:
+        raise ValueError('every_ms phải là số nguyên dương')
+    mode = config.get('workload_mode', workload.get('mode', 'normal'))
+    if mode not in {'normal', 'burst', 'replay_alice'}:
+        raise ValueError('Chế độ workload không được hỗ trợ')
+    if mode == 'replay_alice' and 'alice' not in accounts:
+        raise ValueError('Workload replay_alice cần tài khoản alice')
+    users = create_users(config['seed'], accounts, config['chain_id'])
+    rng = sim.rng.child('workload')
+    node_ids = list(sim.nodes)
+    if not node_ids:
+        raise ValueError('Đăng ký node trước khi lập lịch workload')
+    node_ids.sort(key=lambda name: (0, int(name[1:])) if name.startswith('N') and name[1:].isdigit() else (1, name))
+    stop_ms = config['stop']['max_virtual_time_ms']
+    replayed = False
+
+    def emit():
+        nonlocal replayed
+        account = 'alice' if mode == 'replay_alice' and not replayed else rng.choice(accounts)
+        tx = users[account].make_message(rng.choice(texts))
+        receiver = rng.choice(node_ids)
+        sim.inject_message(receiver, make_tx_message(receiver, tx))
+        if mode == 'replay_alice' and not replayed:
+            replayed = True
+            # Đổi origin để node kiểm tra lại cùng TX, không bị dedup wire che lỗi replay.
+            replay_to = node_ids[(node_ids.index(receiver) + 1) % len(node_ids)]
+            at_ms = sim.clock.now() + every_ms
+            if at_ms <= stop_ms:
+                sim.schedule(at_ms, 'client-replay', sim.inject_message,
+                             replay_to, make_tx_message(replay_to, tx))
+
+    for at_ms in range(every_ms, stop_ms + 1, every_ms):
+        sim.schedule(at_ms, 'client-tx', emit)
+    if mode == 'burst':
+        burst = workload['burst']
+        for key in ('at_ms', 'count', 'within_ms'):
+            if type(burst[key]) is not int or burst[key] < 0:
+                raise ValueError('Tham số burst phải là số nguyên không âm')
+        for _ in range(burst['count']):
+            at_ms = burst['at_ms'] + rng.randint(0, burst['within_ms'])
+            if at_ms <= stop_ms:
+                sim.schedule(at_ms, 'client-burst', emit)
