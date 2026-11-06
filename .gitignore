@@ -3,5 +3,5 @@ __pycache__/
 .venv/
 .pytest_cache/
 /part1_import/
-/logs/*.log
-/logs/summaries/*.json
+# Log files are deliverables for grading (Lab01.pdf §8-9): KHÔNG ignore logs/*.log
+# và logs/summaries/*.json — chỉ ignore thư mục sinh tự động khác.

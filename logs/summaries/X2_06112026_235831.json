@@ -1,0 +1,57 @@
+{
+  "converged": true,
+  "duration_ms": 120000,
+  "honest_nodes": [
+    "N0",
+    "N1",
+    "N2",
+    "N3",
+    "N4",
+    "N5"
+  ],
+  "mode": "BLOCKCHAIN",
+  "nodes": {
+    "N0": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N1": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N2": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N3": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N4": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N5": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N6": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N7": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N8": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    },
+    "N9": {
+      "chain": [],
+      "state_hash": "f4bf1e6581da6c74723fbebfa43609fa0a1e32094d65e86ac13fd7cad593358e"
+    }
+  },
+  "safety_prefixes": true,
+  "scenario": "x2_beyond_f"
+}
