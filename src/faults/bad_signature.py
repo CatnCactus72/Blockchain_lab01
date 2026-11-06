@@ -4,6 +4,28 @@ from dataclasses import fields, is_dataclass, replace
 from .base import Behavior, refresh_wire_message
 
 
+def _own_signed(node, message):
+    """Message này có được ký bằng danh tính của chính node lỗi không.
+
+    Ký lại bằng khóa riêng chỉ hợp lệ cho vote/proposal DO node lỗi tạo ra:
+    node Byzantine không thể giả danh danh tính validator khác (README mục 8).
+
+    Trả None khi payload không phải Vote/Proposal (không kiểm tra được danh tính;
+    giữ nguyên hợp đồng cũ: bơm qua node.resign_wrong_domain của Người 2/3).
+    """
+    from ..core.proposal import Proposal
+    from ..core.vote import Vote
+    from ..core.wire import Message
+
+    payload = message.payload if isinstance(message, Message) else message
+    if isinstance(payload, Vote):
+        return payload.validator_id == node.node_id and message.origin == node.node_id
+    if isinstance(payload, Proposal):
+        return payload.header is not None and payload.header.proposer_id == node.node_id \
+            and message.origin == node.node_id
+    return None
+
+
 def _replace_signature(message):
     """Đổi một byte chữ ký; không sửa message gốc. Hỗ trợ cả payload có signature."""
     sig = message.get('signature') if isinstance(message,dict) else getattr(message,'signature',None)
@@ -55,6 +77,20 @@ class BadSignatureBehavior(Behavior):
             return _replace_signature(message)
         if mode == 'wrong_domain':
             # Node + crypto của Người 2 phải ký hợp lệ cho domain SAI.
+            owned = _own_signed(node, message)
+            if owned is False:
+                # Không thể ký lại giúp message của người khác: chuyển tiếp nguyên dạng.
+                return message
+            if owned is None:
+                from ..core.transaction import Transaction
+                from ..core.wire import Message
+                payload = message.payload if isinstance(message, Message) else message
+                if isinstance(payload, Transaction):
+                    # TX được ký bằng khóa user mà node không giữ: không thể ký lại domain sai.
+                    # Hành vi Byzantine thay thế: sửa nội dung sau khi ký → quả quyết BAD_SIGNATURE.
+                    tamper = getattr(node, 'tamper_signed_message', None)
+                    if callable(tamper):
+                        return tamper(message)
             callback = getattr(node,'resign_wrong_domain',None)
             if callback is None:
                 raise NotImplementedError('Cần node.resign_wrong_domain(message) từ Người 2/3')
@@ -78,6 +114,8 @@ class BadSignatureBehavior(Behavior):
             return [(to,self._outbound_messages[identifier])]
         # Chỉ sửa tại outbound để hai hook liên tiếp không đảo byte chữ ký hai lần.
         modified = self._corrupt(node,msg)
+        if modified is msg:
+            return [(to,msg)]
         modified = refresh_wire_message(node,msg,modified)
         self._outbound_messages[identifier] = modified
         self._emitted_ids.add(message_id(modified))
