@@ -1,0 +1,156 @@
+========================================================================
+UNIT TEST
+========================================================================
+--- [test_crypto] ---
+PASS test_crypto.TestCrypto.test_canonical_encoding_determinism
+PASS test_crypto.TestCrypto.test_deterministic_key_derivation
+PASS test_crypto.TestCrypto.test_hashing_helpers
+PASS test_crypto.TestCrypto.test_msg_id_consistency_and_wire_roundtrip
+PASS test_crypto.TestCrypto.test_sign_and_verify_valid
+PASS test_crypto.TestCrypto.test_tampered_data_or_wrong_key_returns_bad_signature
+PASS test_crypto.TestCrypto.test_wrong_domain_detection
+--- [test_state] ---
+PASS test_state.TestStateExecution.test_apply_valid_tx_and_nonce_progression
+PASS test_state.TestStateExecution.test_nonce_zero_is_replayed_tx_and_nfc_lookup
+PASS test_state.TestStateExecution.test_reject_bad_key
+PASS test_state.TestStateExecution.test_reject_bad_nonce_and_replayed_tx
+PASS test_state.TestStateExecution.test_reject_not_owner
+PASS test_state.TestStateExecution.test_reject_unknown_account_and_bad_signatures
+PASS test_state.TestStateExecution.test_state_hash_independent_of_insertion_order
+--- [test_vote_counter] ---
+PASS test_vote_counter.TestVoteCounterBasics.test_add_counts_each_validator_once
+PASS test_vote_counter.TestVoteCounterBasics.test_bad_counter_config_rejected
+PASS test_vote_counter.TestVoteCounterBasics.test_build_certificate_needs_quorum_and_returns_first_seven
+PASS test_vote_counter.TestVoteCounterBasics.test_conflicting_vote_rejected_with_evidence
+PASS test_vote_counter.TestVoteCounterBasics.test_count_any_not_required_same_value
+PASS test_vote_counter.TestVoteCounterBasics.test_duplicate_vote_not_counted_twice
+PASS test_vote_counter.TestVoteCounterBasics.test_nil_votes_counted_separately
+PASS test_vote_counter.TestVoteCounterBasics.test_phases_and_rounds_are_separate_slots
+PASS test_vote_counter.TestVoteCounterBasics.test_precommit_quorum_any_round_prefers_lowest_round
+PASS test_vote_counter.TestVoteCounterBasics.test_prune_and_clear
+PASS test_vote_counter.TestVoteCounterBasics.test_quorum_at_exactly_seven
+PASS test_vote_counter.TestVoteCounterBasics.test_round_to_skip_to_requires_f_plus_one
+--- [test_block_validation] ---
+PASS test_block_validation.TestBlockValidation.test_commit_certificate_conflicting_vote_and_round_check
+PASS test_block_validation.TestBlockValidation.test_ledger_sync_and_query
+PASS test_block_validation.TestBlockValidation.test_proposal_and_reproposal_validation
+PASS test_block_validation.TestBlockValidation.test_proposal_bad_sig_via_relay_vs_not_proposer
+PASS test_block_validation.TestBlockValidation.test_proposer_selection_module
+PASS test_block_validation.TestBlockValidation.test_reject_bad_parent
+PASS test_block_validation.TestBlockValidation.test_reject_bad_signature_wrong_domain_wrong_chain
+PASS test_block_validation.TestBlockValidation.test_reject_bad_state_hash
+PASS test_block_validation.TestBlockValidation.test_reject_bad_timestamp
+PASS test_block_validation.TestBlockValidation.test_reject_bad_tx_root
+PASS test_block_validation.TestBlockValidation.test_reject_not_proposer
+PASS test_block_validation.TestBlockValidation.test_valid_block_passes
+--- [test_limits] ---
+PASS test_limits.TestLimits.test_block_body_size_limit_4096_and_pool_selection
+PASS test_limits.TestLimits.test_tx_byte_size_limit_1024
+PASS test_limits.TestLimits.test_vietnamese_nfc_and_emoji_char_limit
+--- [test_part1_environment] ---
+PASS test_part1_environment.EnvironmentTests.test_all_scenarios_and_invalid_config
+PASS test_part1_environment.EnvironmentTests.test_bad_signature_rebuilds_wire_id_once
+PASS test_part1_environment.EnvironmentTests.test_child_rng_independent_and_repeatable
+PASS test_part1_environment.EnvironmentTests.test_clock_monotonic
+PASS test_part1_environment.EnvironmentTests.test_config_merge_keeps_nested
+PASS test_part1_environment.EnvironmentTests.test_direct_body_not_gossiped_or_deduplicated
+PASS test_part1_environment.EnvironmentTests.test_env_rng_preserves_stream_state
+PASS test_part1_environment.EnvironmentTests.test_equivocation_requires_valid_resign
+PASS test_part1_environment.EnvironmentTests.test_fault_callbacks_remain_pending_without_node_core
+PASS test_part1_environment.EnvironmentTests.test_fault_factory_and_sign_corruption
+PASS test_part1_environment.EnvironmentTests.test_faulty_override_numeric_and_unknown_ids
+PASS test_part1_environment.EnvironmentTests.test_invalid_link_configuration_rejected_before_delivery
+PASS test_part1_environment.EnvironmentTests.test_link_after_gst_bounded
+PASS test_part1_environment.EnvironmentTests.test_logger_deterministic
+PASS test_part1_environment.EnvironmentTests.test_max_time_and_past_scheduling
+PASS test_part1_environment.EnvironmentTests.test_mutation_refuses_stale_wire_id_without_core_adapter
+PASS test_part1_environment.EnvironmentTests.test_network_block_and_automatic_unblock_events
+PASS test_part1_environment.EnvironmentTests.test_network_gossip_delivers_unique_at_nodes
+PASS test_part1_environment.EnvironmentTests.test_network_outbound_rate_limit_delays_and_logs
+PASS test_part1_environment.EnvironmentTests.test_queue_tie_breaker
+PASS test_part1_environment.EnvironmentTests.test_rate_limits_and_unblock
+PASS test_part1_environment.EnvironmentTests.test_rejected_and_ignored_gossip_not_forwarded
+PASS test_part1_environment.EnvironmentTests.test_replay_timer_does_not_recurse
+PASS test_part1_environment.EnvironmentTests.test_target_height_stops_before_future_timeout
+PASS test_part1_environment.EnvironmentTests.test_timer_cancellation_and_same_time_order
+PASS test_part1_environment.EnvironmentTests.test_topology_ring_plus_two
+PASS test_part1_environment.EnvironmentTests.test_wire_id_required_and_enum_verdict_supported
+--- [test_part1_part2_integration] ---
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_bad_signature_corrupts_real_nested_tx_vote_and_proposal
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_envelope_hops_and_canonical_roundtrip_keep_message_id
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_equivocation_has_two_conflicting_valid_signatures
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_get_votes_and_votes_travel_point_to_point
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_node_protocol_contract_and_reject_reason
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_proposal_equivocation_keeps_header_and_proposal_signatures_valid
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_real_messages_reorder_without_losing_identity
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_real_tx_gossip_and_per_node_state_isolation
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_real_wire_drop_before_gst_and_duplicate_after_gst
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_receiver_mutation_does_not_change_forwarded_payload
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_sender_mutation_after_send_cannot_change_queued_message
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_signed_workload_burst_and_replay
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_sync_fixture_via_network_validates_certificate_and_preserves_log_unicode
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_sync_rejects_missing_forged_or_truncated_certificates
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_sync_without_keybooks_cannot_trust_peer_certificate
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_wire_decoder_rejects_unconsumed_payload_bytes
+PASS test_part1_part2_integration.Part1Part2IntegrationTests.test_wrong_domain_and_tamper_use_actual_ed25519
+========================================================================
+E2E T1 - T8
+========================================================================
+--- [test_t1_normal] ---
+PASS test_t1_normal.TestT1Normal.test_all_honest_nodes_converge
+PASS test_t1_normal.TestT1Normal.test_every_node_finalizes_target_heights
+PASS test_t1_normal.TestT1Normal.test_invariants_hold
+PASS test_t1_normal.TestT1Normal.test_no_rejects_in_normal_run
+--- [test_t2_dup_reorder] ---
+PASS test_t2_dup_reorder.TestT2DupReorder.test_applied_nonce_per_account_ordered
+PASS test_t2_dup_reorder.TestT2DupReorder.test_duplicate_delivery_observed
+PASS test_t2_dup_reorder.TestT2DupReorder.test_honest_nodes_converge
+PASS test_t2_dup_reorder.TestT2DupReorder.test_invariants_hold
+PASS test_t2_dup_reorder.TestT2DupReorder.test_n4_chains_ends_behind_but_prefix_safe
+--- [test_t3_bad_signature] ---
+PASS test_t3_bad_signature.TestT3BadSignature.test_applied_nonce_per_account_ordered
+PASS test_t3_bad_signature.TestT3BadSignature.test_converged
+PASS test_t3_bad_signature.TestT3BadSignature.test_invariants_hold
+PASS test_t3_bad_signature.TestT3BadSignature.test_three_reject_kinds_observed
+--- [test_t4_replay_tx] ---
+PASS test_t4_replay_tx.TestT4ReplayTx.test_alice_applied_nonce_each_once_in_order
+PASS test_t4_replay_tx.TestT4ReplayTx.test_converged
+PASS test_t4_replay_tx.TestT4ReplayTx.test_invariants_hold
+PASS test_t4_replay_tx.TestT4ReplayTx.test_replayed_nonce_rejected
+--- [test_t5_pre_gst] ---
+PASS test_t5_pre_gst.TestT5PreGst.test_converged_after_gst
+PASS test_t5_pre_gst.TestT5PreGst.test_drops_and_delays_before_gst
+PASS test_t5_pre_gst.TestT5PreGst.test_invariants_hold
+--- [test_t6_silent_proposer] ---
+PASS test_t6_silent_proposer.TestT6SilentProposer.test_converged
+PASS test_t6_silent_proposer.TestT6SilentProposer.test_height1_finalized_in_later_round
+PASS test_t6_silent_proposer.TestT6SilentProposer.test_height1_round0_times_out_then_new_round
+PASS test_t6_silent_proposer.TestT6SilentProposer.test_invariants_hold
+--- [test_t7_byzantine] ---
+PASS test_t7_byzantine.TestT7Byzantine.test_conflict_rejects_from_byzantine_only
+PASS test_t7_byzantine.TestT7Byzantine.test_conflicts_and_duplicates_detected
+PASS test_t7_byzantine.TestT7Byzantine.test_converged
+PASS test_t7_byzantine.TestT7Byzantine.test_equivocators_excluded_from_honest
+PASS test_t7_byzantine.TestT7Byzantine.test_invariants_hold
+--- [test_t8_determinism] ---
+PASS test_t8_determinism.TestT8Determinism.test_config_declares_t8_cases
+PASS test_t8_determinism.TestT8Determinism.test_t1_normal_deterministic
+PASS test_t8_determinism.TestT8Determinism.test_t7_byzantine_deterministic
+========================================================================
+E2E PHỤ X1, X2 (báo riêng)
+========================================================================
+--- [test_x1_burst] ---
+PASS test_x1_burst.TestX1Burst.test_converged
+PASS test_x1_burst.TestX1Burst.test_invariants_hold
+PASS test_x1_burst.TestX1Burst.test_many_messages_applied
+PASS test_x1_burst.TestX1Burst.test_no_block_too_large
+PASS test_x1_burst.TestX1Burst.test_per_account_nonces_strictly_ordered
+--- [test_x2_beyond_f] ---
+PASS test_x2_beyond_f.TestX2BeyondF.test_invariants_hold
+PASS test_x2_beyond_f.TestX2BeyondF.test_no_finalize_at_all
+PASS test_x2_beyond_f.TestX2BeyondF.test_runs_to_max_virtual_time
+PASS test_x2_beyond_f.TestX2BeyondF.test_safety_prefixes_true
+PASS test_x2_beyond_f.TestX2BeyondF.test_silent_nodes_excluded_from_honest
+========================================================================
+KẾT QUẢ TỔNG: MỌI TEST PASS
+========================================================================

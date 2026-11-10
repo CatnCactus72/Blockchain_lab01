@@ -1,0 +1,28 @@
+{
+  "latex-workshop.latex.outDir": "%DIR%/output/pdf",
+  "latex-workshop.latex.jobname": "REPORT",
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "XeLaTeX - REPORT.pdf",
+      "tools": ["report-xelatex", "report-xelatex"]
+    }
+  ],
+  "latex-workshop.latex.tools": [
+    {
+      "name": "report-xelatex",
+      "command": "xelatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-halt-on-error",
+        "-jobname=REPORT",
+        "-output-directory=%OUTDIR%",
+        "%DOC%"
+      ]
+    }
+  ]
+}
