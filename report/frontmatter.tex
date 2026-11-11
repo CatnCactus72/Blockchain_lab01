@@ -1,0 +1,23 @@
+% Mục lục dùng số La Mã, tách khỏi phần nội dung đánh số Ả Rập.
+\thispagestyle{plain}
+\tableofcontents
+\vspace{8mm}
+\subsection*{Tóm tắt}
+Chat Chain mô phỏng một kênh chat chung: mỗi tin nhắn là giao dịch có chữ ký, các validator thống nhất thứ tự bằng quy trình đề xuất, prevote, precommit và finalize. Dự án sử dụng 10 validator, chịu tối đa 3 lỗi Byzantine theo giả định của bài, chạy trong một process với đồng hồ ảo và nguồn ngẫu nhiên theo seed. Mỗi node giữ state, ledger và view riêng; mọi trao đổi giữa node đi qua mạng mô phỏng.
+
+Báo cáo đối chiếu đề \code{Lab01.pdf}, mã nguồn tại commit \code{add5f32} và lần chạy kiểm thử ngày \textbf{11/11/2026}. Các giới hạn và sai khác so với README được nêu ở Mục 8.
+
+\vspace{4mm}
+\subsection*{Phân công thực hiện}
+{\small
+\begin{tabularx}{\linewidth}{P{37mm}P{22mm}Y}
+\toprule
+\textbf{Họ và tên} & \textbf{MSSV} & \textbf{Phần việc chính}\\
+\midrule
+\TeamThreeName & \TeamThreeId & Consensus, Node orchestration, block builder, view, vote counter và kiểm thử e2e.\\
+\TeamTwoName & \TeamTwoId & Mật mã, dữ liệu lõi, thực thi state, validation, pool, ledger, sync và query.\\
+\TeamOneName & \TeamOneId & Đồng hồ ảo, mạng, gossip, log, fault hooks, cấu hình và tích hợp môi trường.\\
+\bottomrule
+\end{tabularx}\par}
+\vfill
+{\small Kho mã nguồn: \url{https://github.com/CatnCactus72/Blockchain_lab01}\par}
